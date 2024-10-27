@@ -1,7 +1,7 @@
 import axios from "axios";
 // import { useEffect } from 'react';
 
-const baseUrl = "http://sharetaxi.somee.com/api/";
+const baseUrl = "https://admin-share-taxi.vercel.app/";
 const api = axios.create({
   baseURL: baseUrl,
 });
