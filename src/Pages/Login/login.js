@@ -13,7 +13,7 @@ function Login() {
     setLoading(true);
     try {
       // Actual login API request
-      const response = await axios.post("http://sharetaxi.somee.com/api/", {
+      const response = await axios.post("Login", {
         email: values.email,
         password: values.password,
       });
