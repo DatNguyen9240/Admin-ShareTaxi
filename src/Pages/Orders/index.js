@@ -12,6 +12,7 @@ const CreateTrip = () => {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [form] = Form.useForm();
   const [driverForm] = Form.useForm();
+  const [openAdd, setOpenAdd] = useState(false);
 
   useEffect(() => {
     const fetchTripsAndDrivers = async () => {
@@ -213,6 +214,51 @@ const CreateTrip = () => {
       message.error('Error updating driver details. Please try again.');
     }
   };
+  const showAddModal = () => {
+    form.resetFields();
+    setOpenAdd(true);
+  };
+
+  const handleAddTrip = async (values) => {
+    console.log(values);
+    try {
+      await axios.post('Trip/create', {
+        pickUpLocationId: values.pickUpLocationId,
+        dropOffLocationId: values.dropOffLocationId,
+        maxPerson: values.maxPerson,
+        minPerson: values.minPerson,
+        bookingDate: values.bookingDate,
+        hourInDay: `${values.hourInDay}:00`,
+      });
+
+      message.success("Trip added successfully.");
+      setOpenAdd(false);
+      form.resetFields();
+
+      // Cập nhật lại danh sách chuyến đi sau khi thêm
+      const tripResponse = await axios.get('Trip/list');
+      const tripData = tripResponse.data.$values.filter(item => item.status !== 0);
+
+      const tripWithDrivers = await Promise.all(
+        tripData.map(async (trip) => {
+          try {
+            const carTripResponse = await axios.get(`CarTrip?${trip.id}`);
+            const carTripData = carTripResponse.data.$values;
+            const driverInfo = carTripData.find(item => item.tripId === trip.id);
+            return { ...trip, driverInfo: driverInfo || null };
+          } catch (error) {
+            console.error(`Error fetching car trip for TripId ${trip.id}:`, error);
+            return { ...trip, driverInfo: null };
+          }
+        })
+      );
+
+      setDataSource(tripWithDrivers);
+    } catch (error) {
+      console.error('Error adding trip:', error);
+      message.error('Error adding trip. Please try again.');
+    }
+  };
 
   return (
     <Space size={20} direction="vertical">
@@ -248,9 +294,14 @@ const CreateTrip = () => {
             },
           },
           {
-            title: "Action",
+            title: (
+              <>
+                Action <Button onClick={showAddModal} type="link" style={{ padding: 0, marginLeft: 8 }}>+</Button>
+              </>
+            ),
             render: (text, trip) => (
               <>
+                
                 <Button onClick={() => showEditModal(trip)}>Edit Status</Button>
                 <Button type="primary" onClick={() => showDriverModal(trip)}>
                   {trip.driverInfo ? "Edit Driver" : "Call Driver"}
@@ -305,6 +356,37 @@ const CreateTrip = () => {
               <Option value="Active">Active</Option>
               <Option value="Inactive">Inactive</Option>
             </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Add New Trip"
+        open={openAdd}
+        onCancel={() => setOpenAdd(false)}
+        onOk={() => form.submit()}
+      >
+        <Form form={form} onFinish={handleAddTrip}>
+          <Form.Item name="pickUpLocationId" label="Pick Up Location Id" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="dropOffLocationId" label="Drop Off Location Id" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="unitPrice" label="Base Price" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item name="maxPerson" label="Max Passengers" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item name="minPerson" label="Min Passengers" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item name="bookingDate" label="Departure Date" rules={[{ required: true }]}>
+            <Input type="date" />
+          </Form.Item>
+          <Form.Item name="hourInDay" label="Departure Time" rules={[{ required: true }]}>
+            <Input placeholder="HH:MM format" />
           </Form.Item>
         </Form>
       </Modal>

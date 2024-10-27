@@ -20,7 +20,7 @@ const TripTypePricing = () => {
       try {
         const response = await axios.get('TripTypePricing');
         if (Array.isArray(response.data.$values)) {
-          setDataSource(response.data.$values.filter(pricing => pricing.status === 1));
+          setDataSource(response.data.$values);
         } else {
           message.error("Unexpected data format. Please check the API.");
           setDataSource([]);
@@ -115,6 +115,8 @@ const TripTypePricing = () => {
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
         <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
         <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
+        <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
+
       </Space>
       <Table
         loading={loading}

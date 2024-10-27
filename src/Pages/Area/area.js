@@ -22,7 +22,7 @@ const Area = () => {
         console.log("Fetched area data:", response.data.$values);
 
         if (Array.isArray(response.data.$values)) {
-          setDataSource(response.data.$values.filter(area => area.status === 1));
+          setDataSource(response.data.$values);
         } else {
           message.error("Unexpected data format. Please check the API.");
           setDataSource([]);
@@ -102,6 +102,8 @@ const Area = () => {
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
         <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
         <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
+        <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
+
       </Space>
       <Table
         loading={loading}

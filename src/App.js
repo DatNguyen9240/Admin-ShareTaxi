@@ -11,11 +11,12 @@ import Transaction from "./Pages/Transaction/transaction";
 import Wallet from "./Pages/Wallet/wallet";
 import Login from "./Pages/Login/login";
 import { useAuth } from './Components/AuthContext'; 
-import CreateTrip from "./Pages/CreateTrip";
+import TripStatistics from "./Pages/Statistic";
 import Dashboard from "./Pages/Dashbaord/";
 import Inventory from "./Pages/Inventory";
 import Orders from "./Pages/Orders";
 import AddStaff from "./Pages/addStaff/addStaff";
+import Location from "./Pages/Location/location";
 function App() {
   const { isAuthenticated, role } = useAuth(); // Get role from AuthContext
 
@@ -24,12 +25,13 @@ function App() {
     { path: "/trip-type", component: TripType, roles: ['admin'] }, // Đổi đường dẫn thành chữ thường
     { path: "/trip-type-pricing", component: TripTypePricing, roles: ['admin'] }, // Đổi đường dẫn thành chữ thường
     { path: "/area", component: Area, roles: ['admin'] },
+    { path: "/location", component: Location, roles: ['admin'] },
     { path: "/transaction", component: Transaction, roles: ['admin'] },
     { path: "/wallet", component: Wallet, roles: ['admin', 'staff'] },
     { path: "/dashboard", component: Dashboard, roles: ['admin'] },
     { path: "/inventory", component: Inventory, roles: ['admin'] },
     { path: "/orders", component: Orders, roles: ['admin', 'staff'] },
-    { path: "/createTrip", component: CreateTrip, roles: ['admin','staff'] },
+    { path: "/statistic", component: TripStatistics, roles: ['admin'] },
     { path: "/add-staff", component: AddStaff, roles: ['admin'] },
 
 

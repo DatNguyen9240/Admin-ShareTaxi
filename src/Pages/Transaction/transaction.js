@@ -64,6 +64,7 @@ const Transaction = () => {
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
         <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
         <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
+        <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
       </Space>
       <Table
         loading={loading}

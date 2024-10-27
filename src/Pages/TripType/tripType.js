@@ -19,7 +19,7 @@ const CreateTrip = () => {
       const response = await axios.get('TripType');
 
       if (Array.isArray(response.data.$values)) {
-        setDataSource(response.data.$values.filter(tripType => tripType.status === 1));
+        setDataSource(response.data.$values);
       } else {
         message.error("Unexpected data format. Please check the API.");
         setDataSource([]);
@@ -107,7 +107,7 @@ const CreateTrip = () => {
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
         <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
         <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
-        <Button type="primary" onClick={showAddModal}>Add Trip Type</Button> {/* Button to open Add modal */}
+        <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
       </Space>
       <Table
         loading={loading}

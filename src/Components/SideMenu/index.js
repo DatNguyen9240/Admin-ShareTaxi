@@ -39,15 +39,16 @@ function SideMenu() {
       icon: <UserOutlined />,
     },
     {
+      label: "Statistic",
+      key: "/statistic",
+      icon: <UserOutlined />,
+    },
+    {
       label: "Orders",
       key: "/orders",
       icon: <ShoppingCartOutlined />,
     },
-    {
-      label: "Create Trip",
-      key: "/createTrip",
-      icon: <UserOutlined />,
-    },
+    
   ];
 
   const staffMenuItems = [
@@ -57,8 +58,8 @@ function SideMenu() {
       icon: <ShoppingCartOutlined />,
     },
     {
-      label: "Create Trip",
-      key: "/createTrip",
+      label: "Statistic",
+      key: "/statistic",
       icon: <UserOutlined />,
     },
   ];

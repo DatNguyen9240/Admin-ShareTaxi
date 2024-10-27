@@ -20,7 +20,7 @@ function UserManagement() {
     setLoading(true);
     try {
       const response = await axios.get('User/User List');
-      setDataSource(response.data.$values.filter(user => user.status === 1).map(user => ({
+      setDataSource(response.data.$values.map(user => ({
         ...user,
         CreatedAt: user.createdAt.split('T')[1].replace('Z', ''),
         DateOfBirth: dayjs(user.dateOfBirth).format('YYYY-MM-DD'), 
@@ -79,6 +79,7 @@ function UserManagement() {
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
         <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
         <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
+        <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
       </Space>
 
       <Table

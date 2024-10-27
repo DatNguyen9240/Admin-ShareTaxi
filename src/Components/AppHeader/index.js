@@ -38,12 +38,12 @@ function AppHeader() {
         {title} {/* Dynamic title based on user role */}
       </Typography.Title>
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <Switch
+        {/* <Switch
           checked={darkMode}
           onChange={toggleDarkMode}
           checkedChildren="Dark"
           unCheckedChildren="Light"
-        />
+        /> */}
         {isAuthenticated ? (
           <Button type="primary" onClick={handleLogout}>
             Logout

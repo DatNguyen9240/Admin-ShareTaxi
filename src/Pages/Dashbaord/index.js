@@ -70,7 +70,12 @@ function Dashboard() {
         <Input
           type="number"
           value={topCount}
-          onChange={(e) => setTopCount(Number(e.target.value))}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+            if (value >= 1) { // Chỉ cho phép nhập từ 1 trở đi
+              setTopCount(value);
+            }
+          }}
           style={{ width: 100 }}
         />
         {/* Thêm nút xác nhận */}
