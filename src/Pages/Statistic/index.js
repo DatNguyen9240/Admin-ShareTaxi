@@ -93,5 +93,4 @@ function TripStatistics() {
     </Space>
   );
 }
-
 export default TripStatistics;
