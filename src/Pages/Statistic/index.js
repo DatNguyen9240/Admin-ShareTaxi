@@ -1,19 +1,46 @@
-import { Space, Table, Typography, Button, message, Modal, Form } from "antd";
+import { Space, Typography, message, Row, Col } from "antd";
 import { useEffect, useState } from "react";
 import axios from "../../config/axios";
+import BarChart from "../../Components/BarChart/BarChart";
+import PieChart from "../../Components/PieChart/PieChart";
 
 function TripStatistics() {
   const [loading, setLoading] = useState(false);
-  const [tripData, setTripData] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
+  const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     const fetchTripStatistics = async () => {
       setLoading(true);
       try {
         const tripResponse = await axios.get('Trip/TripStatistics');
-        setTripData(tripResponse.data); // Save the fetched trip data
+        const tripData = tripResponse.data;
+
+        setChartData({
+          labels: tripData.tripsPerMonth.$values.map(item => `${item.year}-${item.month}`),
+          datasets: [
+            {
+              label: 'Trips Per Month',
+              data: tripData.tripsPerMonth.$values.map(item => item.count),
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+            },
+            {
+              label: 'Inactive Trips Per Month',
+              data: tripData.inactiveTripsPerMonth.$values.map(item => item.count),
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
+            },
+            {
+              label: 'Total Participants',
+              data: tripData.participantsStatistics.$values.map(item => item.totalParticipants),
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+            }
+          ]
+        });
       } catch (error) {
         console.error("There was an error fetching the trips!", error);
         message.error("Error fetching trip statistics. Please try again.");
@@ -25,72 +52,25 @@ function TripStatistics() {
     fetchTripStatistics();
   }, []);
 
-  const showEditModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setIsModalOpen(false);
-  };
-
-  // Prepare the data for the tables
-  const tripsPerMonthData = tripData?.tripsPerMonth?.$values || [];
-  const participantsStatisticsData = tripData?.participantsStatistics?.$values || [];
-
   return (
     <Space size={20} direction="vertical" style={{ width: "100%" }}>
       <Typography.Title level={4}>Trip Statistics</Typography.Title>
       
-      {tripData && (
-        <>
-          <Typography.Title level={5}>Most Created Trip</Typography.Title>
-          <Typography.Paragraph>
-            From: {tripData.mostCreatedTrip.from}<br />
-            To: {tripData.mostCreatedTrip.to}<br />
-            Count: {tripData.mostCreatedTrip.count}
-          </Typography.Paragraph>
-        
-          <Typography.Title level={5}>Trips Per Month</Typography.Title>
-          <Table
-            loading={loading}
-            rowKey={(record) => `${record.year}-${record.month}`}
-            columns={[
-              { title: "Year", dataIndex: "year" },
-              { title: "Month", dataIndex: "month" },
-              { title: "Count", dataIndex: "count" },
-            ]}
-            dataSource={tripsPerMonthData}
-            pagination={false}
-          />
-
-          <Typography.Title level={5}>Inactive Trips Per Month</Typography.Title>
-          <Typography.Paragraph>No inactive trips data available.</Typography.Paragraph>
-
-          <Typography.Title level={5}>Participants Statistics</Typography.Title>
-          <Table
-            loading={loading}
-            rowKey={(record) => `${record.year}-${record.month}-participants`}
-            columns={[
-              { title: "Year", dataIndex: "year" },
-              { title: "Month", dataIndex: "month" },
-              { title: "Total Participants", dataIndex: "totalParticipants" },
-            ]}
-            dataSource={participantsStatisticsData}
-            pagination={false}
-          />
-        </>
+      {/* Render the BarChart and PieChart in a row */}
+      {chartData && (
+        <Row gutter={16} justify="center">
+          <Col xs={24} sm={16} md={16} lg={16} xl={16}>
+            <BarChart chartData={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </Col>
+          <Col xs={24} sm={8} md={8} lg={8} xl={8} style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: '80%', maxWidth: '300px' }}>
+              <PieChart chartData={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
+          </Col>
+        </Row>
       )}
-      
-      {/* You can add modal functionality for editing or viewing statistics if necessary */}
-      <Modal
-        title="Edit Trip Details"
-        open={isModalOpen}
-        onCancel={closeEditModal}
-        footer={null}
-      >
-        {/* You can put details of the selected trip here */}
-      </Modal>
     </Space>
   );
 }
+
 export default TripStatistics;

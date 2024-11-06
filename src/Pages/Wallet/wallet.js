@@ -123,6 +123,7 @@ const Wallet = () => {
               {
                 title: "Balance",
                 dataIndex: "balance", // Display wallet balance
+                render: (value) => <span>${value.toLocaleString()}</span>,
               },
               {
                 title: "Currency Code",

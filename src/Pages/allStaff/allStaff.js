@@ -2,20 +2,18 @@ import {
   Space,
   Table,
   Typography,
-  Button,
-  Modal,
+
   Form,
-  Input,
-  Select,
+
   message,
-  DatePicker,
+
 } from "antd";
 import { useEffect, useState } from "react";
 import axios from "../../config/axios";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 
-function AddStaff() {
+function AllStaff() {
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [open, setOpen] = useState(false);
@@ -59,7 +57,7 @@ function AddStaff() {
 
   return (
     <Space size={20} direction="vertical">
-      <Typography.Title level={4}>Add Staff</Typography.Title>
+      <Typography.Title level={4}>All Staff</Typography.Title>
 
       {/* Button to open modal */}
 
@@ -83,4 +81,4 @@ function AddStaff() {
   );
 }
 
-export default AddStaff;
+export default AllStaff;

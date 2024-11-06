@@ -37,7 +37,7 @@ const Transaction = () => {
   const handleViewTransactions = async (userId, userName) => {
     setLoading(true);
     try {
-      const response = await axios.get(`TransactionHistory/user/${userId}?page=1&pageSize=10`);
+      const response = await axios.get(`TransactionHistory/user/${userId}?page=1&pageSize=1000`);
       if (Array.isArray(response.data.transactions.$values)) {
         setTransactions(response.data.transactions.$values);
         setSelectedUser(userName); // Đặt tên user để hiển thị trong modal
@@ -91,7 +91,7 @@ const Transaction = () => {
           },
         ]}
         dataSource={dataSource}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 1000 }}
         rowKey={(user) => user.id}
       />
 
@@ -117,6 +117,7 @@ const Transaction = () => {
             {
               title: "Amount",
               dataIndex: "amount", // Hiển thị số tiền
+              render: (value) => <span>${value.toLocaleString()}</span>,
             },
             {
               title: "Transaction Type",

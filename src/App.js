@@ -15,7 +15,7 @@ import TripStatistics from "./Pages/Statistic";
 import Dashboard from "./Pages/Dashbaord/";
 import Inventory from "./Pages/Inventory";
 import Orders from "./Pages/Orders";
-import AddStaff from "./Pages/addStaff/addStaff";
+import AllStaff from "./Pages/allStaff/allStaff";
 import Location from "./Pages/Location/location";
 function App() {
   const { isAuthenticated, role } = useAuth(); // Get role from AuthContext
@@ -32,7 +32,7 @@ function App() {
     { path: "/inventory", component: Inventory, roles: ['admin'] },
     { path: "/orders", component: Orders, roles: ['admin', 'staff'] },
     { path: "/statistic", component: TripStatistics, roles: ['admin'] },
-    { path: "/add-staff", component: AddStaff, roles: ['admin'] },
+    { path: "/all-staff", component: AllStaff, roles: ['admin'] },
 
 
     

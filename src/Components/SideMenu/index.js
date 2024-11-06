@@ -34,8 +34,8 @@ function SideMenu() {
       icon: <ShopOutlined />,
     },
     {
-      label: "Add Staff",  // New Menu Item
-      key: "/add-staff",   // Key for the route
+      label: "All Staff",  // New Menu Item
+      key: "/all-staff",   // Key for the route
       icon: <UserOutlined />,
     },
     {
@@ -57,11 +57,7 @@ function SideMenu() {
       key: "/orders",
       icon: <ShoppingCartOutlined />,
     },
-    {
-      label: "Statistic",
-      key: "/statistic",
-      icon: <UserOutlined />,
-    },
+
   ];
 
   // Choose menu items based on the user's role

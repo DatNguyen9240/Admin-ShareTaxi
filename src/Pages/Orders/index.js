@@ -1,5 +1,5 @@
 import { Space, Table, Typography, message, Button, Modal, Form, Input, Select } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from '../../config/axios';
 
 const { Option } = Select;
@@ -13,39 +13,39 @@ const CreateTrip = () => {
   const [form] = Form.useForm();
   const [driverForm] = Form.useForm();
   const [openAdd, setOpenAdd] = useState(false);
+  const [userInTripData, setUserInTripData] = useState([]);
+  const [tripFullStatus, setTripFullStatus] = useState({});
+
+  const fetchTripsAndDrivers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const tripResponse = await axios.get('Trip/list');
+      const tripData = tripResponse.data.$values;
+
+      const tripWithDrivers = await Promise.all(
+        tripData.map(async (trip) => {
+          const carTripResponse = await axios.get(`CarTrip?${trip.id}`);
+          const carTripData = carTripResponse.data.$values;
+          const driverInfo = carTripData.find(item => item.tripId === trip.id);
+          
+          await fetchTripFullStatus(trip.id);
+
+          return { ...trip, driverInfo: driverInfo || null };
+        })
+      );
+
+      setDataSource(tripWithDrivers.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)));
+    } catch (error) {
+      console.error("There was an error fetching the trips!", error);
+      message.error("Error fetching trips. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchTripsAndDrivers = async () => {
-      setLoading(true);
-      try {
-        const tripResponse = await axios.get('Trip/list');
-        const tripData = tripResponse.data.$values.filter(item => item.status !== 0);
-
-        const tripWithDrivers = await Promise.all(
-          tripData.map(async (trip) => {
-            try {
-              const carTripResponse = await axios.get(`CarTrip?${trip.id}`);
-              const carTripData = carTripResponse.data.$values;
-              const driverInfo = carTripData.find(item => item.tripId === trip.id);
-              return { ...trip, driverInfo: driverInfo || null };
-            } catch (error) {
-              console.error(`Error fetching car trip for TripId ${trip.id}:`, error);
-              return { ...trip, driverInfo: null };
-            }
-          })
-        );
-
-        setDataSource(tripWithDrivers);
-      } catch (error) {
-        console.error("There was an error fetching the trips!", error);
-        message.error("Error fetching trips. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTripsAndDrivers();
-  }, []);
+  }, [fetchTripsAndDrivers]);
 
   const formatISODate = (isoDate) => {
     const date = new Date(isoDate);
@@ -72,51 +72,48 @@ const CreateTrip = () => {
   };
 
   const handleStatusUpdate = async (tripId, values) => {
-    try {
-      console.log(tripId);
-      
-      const status = mapValueToStatus(values.status);
-      await axios.patch(`Trip/updateStatus/${tripId}`, {
-        newStatus:  status
-      });
-      message.success("Trip status updated successfully.");
-      setOpen(false);
-      form.resetFields();
+    Modal.confirm({
+      title: 'Confirm Status Update',
+      content: 'Are you sure you want to update the status of this trip?',
+      onOk: async () => {
+        try {
+          
+          const status = values.status;
+          await axios.patch(`Trip/updateStatus/${tripId}`, {
+            newStatus:  status
+          });
 
-      const tripResponse = await axios.get('Trip/list');
-        const tripData = tripResponse.data.$values.filter(item => item.status !== 0);
+          if (status === 0) {
+            await axios.post(`Wallet/RefundCancelledTrip?tripId=${tripId}`);
+            message.success("Refund processed successfully.");
+          } else if (status === 3) {
+            await axios.post(`Wallet/RefundTrip?tripId=${tripId}`);
+            message.success("Refund processed successfully.");
+          }
 
-        const tripWithDrivers = await Promise.all(
-          tripData.map(async (trip) => {
-            try {
-              const carTripResponse = await axios.get(`CarTrip?${trip.id}`);
-              const carTripData = carTripResponse.data.$values;
-              const driverInfo = carTripData.find(item => item.tripId === trip.id);
-              return { ...trip, driverInfo: driverInfo || null };
-            } catch (error) {
-              console.error(`Error fetching car trip for TripId ${trip.id}:`, error);
-              return { ...trip, driverInfo: null };
-            }
-          })
-        );
+          message.success("Trip status updated successfully.");
+          setOpen(false);
+          form.resetFields();
 
-        setDataSource(tripWithDrivers);
-    } catch (error) {
-      console.error('Error updating trip status:', error);
-      message.error('Error updating trip status. Please try again.');
-    }
+          fetchTripsAndDrivers();
+        } catch (error) {
+          console.error('Error updating trip status:', error);
+          message.error('Error updating trip status. Please try again.');
+        }
+      },
+    });
   };
 
   const mapValueToStatus = (value) => {
     switch (value) {
       case 0:
-        return '0'; // Cancelled
+        return 'Cancelled'; // Cancelled
       case 1:
-        return '1'; // Pending
+        return 'Pending'; // Pending
       case 2:
-        return '2'; // Booked
+        return 'Booked'; // Booked
       case 3:
-        return '3'; // Trip Cancelled
+        return 'Trip Completed'; // Trip Cancelled
       default:
         return 'Unknown';
     }
@@ -237,7 +234,7 @@ const CreateTrip = () => {
 
       // Cập nhật lại danh sách chuyến đi sau khi thêm
       const tripResponse = await axios.get('Trip/list');
-      const tripData = tripResponse.data.$values.filter(item => item.status !== 0);
+      const tripData = tripResponse.data.$values;
 
       const tripWithDrivers = await Promise.all(
         tripData.map(async (trip) => {
@@ -253,12 +250,71 @@ const CreateTrip = () => {
         })
       );
 
-      setDataSource(tripWithDrivers);
+      setDataSource(tripWithDrivers.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)));
     } catch (error) {
       console.error('Error adding trip:', error);
       message.error('Error adding trip. Please try again.');
     }
   };
+
+  const viewTripDetails = async (trip) => {
+    console.log("Viewing details for trip:", trip);
+    try {
+      const [userInTripResponse] = await Promise.all([
+        axios.get(`Booking/usersInTrip/${trip.id}`),
+      ]);
+      const userInTripData = userInTripResponse.data.$values || [];
+      setUserInTripData(userInTripData);
+    } catch (error) {
+      console.error('Error fetching users in trip:', error);
+      message.error('Error fetching users in trip. Please try again.');
+    }
+    Modal.info({
+      title: 'Trip Details',
+      content: (
+        <div>
+          <p><strong>Pick Up Location:</strong> {trip.pickUpLocationName}</p>
+          <p><strong>Drop Off Location:</strong> {trip.dropOffLocationName}</p>
+          <p><strong>Base Price:</strong> ${trip.unitPrice.toLocaleString()}</p>
+          <p><strong>Max Passengers:</strong> {trip.maxPerson}</p>
+          <p><strong>Min Passengers:</strong> {trip.minPerson}</p>
+          <p><strong>Departure Date:</strong> {formatISODate(trip.bookingDate)}</p>
+          <p><strong>Departure Time:</strong> {trip.hourInDay}</p>
+          <p><strong>Driver Name:</strong> {trip.driverInfo ? trip.driverInfo.driverName : "No driver assigned"}</p>
+          <p><strong>Status:</strong> {mapValueToStatus(trip.status)}</p>
+          <p><strong>Total Users:</strong> {userInTripData.length}</p>
+          {userInTripData.map((user) => (
+            <div key={user.id}>
+              <p><strong>User Id:</strong> {user.id} - <strong>User Name:</strong> {user.name}</p>
+            </div>
+          ))}
+        </div>
+      ),
+      onOk() {},
+    });
+  };
+
+  const checkTripFull = async (tripId) => {
+    try {
+
+      const response = await axios.get(`Booking/checkTripFull/${tripId}`);
+      return response.data.isFull ? "Yes" : "No";
+    } catch (error) {
+      console.error('Error checking trip full status:', error);
+      return "Error";
+    }
+  };
+
+  const fetchTripFullStatus = async (tripId) => {
+    const isFull = await checkTripFull(tripId);
+    setTripFullStatus(prev => ({ ...prev, [tripId]: isFull }));
+  };
+
+  useEffect(() => {
+    dataSource.forEach(trip => {
+      fetchTripFullStatus(trip.id);
+    });
+  }, [dataSource]);
 
   return (
     <Space size={20} direction="vertical">
@@ -270,11 +326,17 @@ const CreateTrip = () => {
         columns={[
           { title: "Pick Up Location", dataIndex: "pickUpLocationName" },
           { title: "Drop Off Location", dataIndex: "dropOffLocationName" },
-          { title: "Base Price", dataIndex: "unitPrice", render: (value) => <span>${value}</span> },
+          { title: "Base Price", dataIndex: "unitPrice", render: (value) => <span>${value.toLocaleString()}</span> },
           { title: "Max Passengers", dataIndex: "maxPerson" },
           { title: "Min Passengers", dataIndex: "minPerson" },
           { title: "Departure Date", dataIndex: "bookingDate", render: (value) => formatISODate(value) },
           { title: "Departure Time", dataIndex: "hourInDay" },
+          {
+            title: "Is Full",
+            render: (text, trip) => (
+              <span>{tripFullStatus[trip.id] || "Loading..."}</span>
+            ),
+          },
           {
             title: "Driver Name",
             dataIndex: ["driverInfo", "driverName"],
@@ -300,13 +362,13 @@ const CreateTrip = () => {
               </>
             ),
             render: (text, trip) => (
-              <>
-                
+              <Space>
                 <Button onClick={() => showEditModal(trip)}>Edit Status</Button>
                 <Button type="primary" onClick={() => showDriverModal(trip)}>
                   {trip.driverInfo ? "Edit Driver" : "Call Driver"}
                 </Button>
-              </>
+                <Button onClick={() => viewTripDetails(trip)}>View Details</Button>
+              </Space>
             ),
           },
         ]}
@@ -372,9 +434,6 @@ const CreateTrip = () => {
           </Form.Item>
           <Form.Item name="dropOffLocationId" label="Drop Off Location Id" rules={[{ required: true }]}>
             <Input />
-          </Form.Item>
-          <Form.Item name="unitPrice" label="Base Price" rules={[{ required: true }]}>
-            <Input type="number" />
           </Form.Item>
           <Form.Item name="maxPerson" label="Max Passengers" rules={[{ required: true }]}>
             <Input type="number" />

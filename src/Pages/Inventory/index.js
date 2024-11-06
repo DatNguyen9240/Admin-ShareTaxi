@@ -174,6 +174,7 @@ function UserManagement() {
             <Select>
               <Select.Option value="admin">Admin</Select.Option>
               <Select.Option value="staff">Staff</Select.Option>
+              <Select.Option value="user">User</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item

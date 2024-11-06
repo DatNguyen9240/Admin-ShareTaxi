@@ -44,7 +44,7 @@ const Area = () => {
     form.setFieldsValue({
       name: area.name,
       description: area.description,
-      status: area.status,
+      status: area.status === 1 ? "Active" : "Inactive",
     });
     setOpenEdit(true);
   };
@@ -54,7 +54,7 @@ const Area = () => {
       await axios.put(`Area/${selectedAreaId}`, {
         name: values.name,
         description: values.description,
-        status: values.status,
+        status: values.status === 'Active' ? 1 : 0, // Chuyển đổi status thành số nguyên
       });
       message.success("Area updated successfully.");
       setOpenEdit(false);
@@ -73,7 +73,7 @@ const Area = () => {
       await axios.post('Area', {
         name: values.name,
         description: values.description,
-        // status: values.status,
+        status: values.status === 'Active' ? 1 : 0,
       });
       message.success("Area added successfully.");
       setOpenAddModal(false);
@@ -103,7 +103,6 @@ const Area = () => {
         <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
         <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
         <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
-
       </Space>
       <Table
         loading={loading}
@@ -170,11 +169,18 @@ const Area = () => {
             name="description"
             rules={[{ required: true, message: 'Please input the area description!' }]}
           >
-            <div> {/* Bọc trong một div */}
-              <Input placeholder="Enter area description" />
-            </div>
+            <Input placeholder="Enter area description" />
           </Form.Item>
-          
+          <Form.Item
+            label="Status"
+            name="status"
+            rules={[{ required: true, message: 'Please select the status!' }]}
+          >
+            <Select placeholder="Select status">
+              <Option value="Inactive">Inactive</Option>
+              <Option value="Active">Active</Option>
+            </Select>
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">Add Area</Button>
           </Form.Item>
@@ -205,21 +211,17 @@ const Area = () => {
             name="description"
             rules={[{ required: true, message: 'Please input the area description!' }]}
           >
-            <div> {/* Bọc trong một div */}
-              <Input placeholder="Enter area description" />
-            </div>
+            <Input placeholder="Enter area description" />
           </Form.Item>
           <Form.Item
             label="Status"
             name="status"
             rules={[{ required: true, message: 'Please select the status!' }]}
           >
-            <div> {/* Bọc trong một div */}
-              <Select placeholder="Select status">
-                <Option value={0}>Inactive</Option>
-                <Option value={1}>Active</Option>
-              </Select>
-            </div>
+            <Select placeholder="Select status">
+              <Option value="Inactive">Inactive</Option>
+              <Option value="Active">Active</Option>
+            </Select>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">Update Area</Button>

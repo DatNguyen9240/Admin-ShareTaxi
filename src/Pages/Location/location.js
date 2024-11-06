@@ -1,4 +1,4 @@
-import { Space, Table, Typography, Button, Modal, Form, Input, Select, message } from "antd";
+import { Space, Table, Typography, Button, Modal, Form, Input, message } from "antd";
 import { useEffect, useState } from "react";
 import axios from '../../config/axios';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,7 @@ function LocationManagement() {
         lat: location.lat,
         lon: location.lon,
         areaId: location.areaId,
+        status: location.status,
       }));
       setDataSource(formattedLocations);
     } catch (error) {
@@ -42,6 +43,7 @@ function LocationManagement() {
       lat: location.lat,
       lon: location.lon,
       areaId: location.areaId,
+      status: location.status,
     });
     setOpen(true);
   };
@@ -59,6 +61,7 @@ function LocationManagement() {
           lat: values.lat,
           lon: values.lon,
           areaId: values.areaId,
+          status: values.status,
         });
         message.success("Location updated successfully.");
         setOpen(false);
@@ -69,6 +72,7 @@ function LocationManagement() {
           lat: values.lat,
           lon: values.lon,
           areaId: values.areaId,
+          status: values.status,
         });
         message.success("Location added successfully.");
         setOpenAdd(false);
@@ -80,19 +84,27 @@ function LocationManagement() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`Location/${id}`);
+      message.success("Location deleted successfully.");
+      fetchLocations(); // Refresh the list after deletion
+    } catch (error) {
+      message.error("Error deleting location.");
+    }
+  };
+
   return (
     <Space size={20} direction="vertical">
       <Typography.Title level={4}>Location Management</Typography.Title>
-      <Space wrap>
-        {["Users", "TripType", "TripTypePricing", "Area", "Transaction", "Wallet", "Location"].map(route => (
-          <Button 
-            type="primary" 
-            onClick={() => navigate(`/${route.toLowerCase()}`)} 
-            key={route}
-          >
-            Go to {route}
-          </Button>
-        ))}
+      <Space>
+        <Button type="primary" onClick={() => navigate('/inventory')}>Go to Users</Button>
+        <Button type="primary" onClick={() => navigate('/trip-type')}>Go to TripType</Button>
+        <Button type="primary" onClick={() => navigate('/trip-type-pricing')}>Go to TripTypePricing</Button>
+        <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
+        <Button type="primary" onClick={() => navigate('/transaction')}>Go to Transaction</Button>
+        <Button type="primary" onClick={() => navigate('/wallet')}>Go to Wallet</Button>
+        <Button type="primary" onClick={() => navigate('/location')}>Go to Location</Button>
       </Space>
 
       <Table
@@ -103,6 +115,7 @@ function LocationManagement() {
           { title: "Latitude", dataIndex: "lat" },
           { title: "Longitude", dataIndex: "lon" },
           { title: "Area", dataIndex: "areaId" },
+          { title: "Status", dataIndex: "status" },
           {
             title: (
               <span>
@@ -168,12 +181,16 @@ function LocationManagement() {
           <Form.Item
             label="Area"
             name="areaId"
-            rules={[{ required: true, message: 'Please select the area!' }]}
+            rules={[{ required: true, message: 'Please enter the area!' }]}
           >
-            <Select>
-              <Select.Option value={1}>Area 1</Select.Option>
-              <Select.Option value={2}>Area 2</Select.Option>
-            </Select>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Status"
+            name="status"
+            rules={[{ required: true, message: 'Please enter the status!' }]}
+          >
+            <Input />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -219,12 +236,16 @@ function LocationManagement() {
           <Form.Item
             label="Area"
             name="areaId"
-            rules={[{ required: true, message: 'Please select the area!' }]}
+            rules={[{ required: true, message: 'Please enter the area!' }]}
           >
-            <Select>
-              <Select.Option value={1}>Area 1</Select.Option>
-              <Select.Option value={2}>Area 2</Select.Option>
-            </Select>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Status"
+            name="status"
+            rules={[{ required: true, message: 'Please enter the status!' }]}
+          >
+            <Input />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
