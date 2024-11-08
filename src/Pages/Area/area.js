@@ -96,7 +96,7 @@ const Area = () => {
     <Space size={20} direction="vertical">
       <Typography.Title level={4}>Area Management</Typography.Title>
       <Space>
-        <Button type="primary" onClick={() => navigate('/inventory')}>Go to Users</Button>
+        <Button type="primary" onClick={() => navigate('/Management')}>Go to Users</Button>
         <Button type="primary" onClick={() => navigate('/trip-type')}>Go to TripType</Button>
         <Button type="primary" onClick={() => navigate('/trip-type-pricing')}>Go to TripTypePricing</Button>
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>

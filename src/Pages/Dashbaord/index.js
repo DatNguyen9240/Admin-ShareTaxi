@@ -1,31 +1,11 @@
 import {
   DollarCircleOutlined,
-  ShoppingCartOutlined,
   ShoppingOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
-import { Card, Space, Statistic, Table, Typography } from "antd";
+import { Card, Space, Statistic, Table, Typography, Row, Col, message } from "antd";
 import { useEffect, useState } from "react";
 import axios from '../../config/axios';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import TripStatistics from '../../Pages/Statistic/index'; // Import TripStatistics
 
 function Dashboard() {
   const [revenue, setRevenue] = useState(0);
@@ -34,14 +14,18 @@ function Dashboard() {
 
   const fetchRevenueData = async () => {
     try {
-      const revenueRes = await axios.get("/Finance/total-revenue");
+      const [revenueRes, depositsRes, topDepositorsRes] = await Promise.all([
+        axios.get("/Finance/total-revenue"),
+        axios.get("/Finance/total-deposits"),
+        axios.get(`/Finance/top-depositors?topCount=5`)
+      ]);
+      
       setRevenue(revenueRes.data);
-      const depositsRes = await axios.get("/Finance/total-deposits");
       setDeposits(depositsRes.data);
-      const topDepositorsRes = await axios.get(`/Finance/top-depositors?topCount=5`);
-      setTopDepositors(topDepositorsRes.data.$values); // Lưu trữ dữ liệu của top depositors
+      setTopDepositors(topDepositorsRes.data.$values);
     } catch (error) {
       console.error("Error fetching revenue data:", error);
+      message.error("Error fetching financial data. Please try again.");
     }
   };
 
@@ -50,49 +34,60 @@ function Dashboard() {
   }, []);
 
   return (
-    <Space size={20} direction="vertical">
-      <Typography.Title level={4}>Dashboard</Typography.Title>
-      
-      {/* Hiển thị Top Count cố định là 5 */}
-     
-      
-      <Space direction="horizontal">
-        <DashboardCard
-          icon={
-            <ShoppingOutlined
-              style={{
-                color: "blue",
-                backgroundColor: "rgba(0,0,255,0.25)",
-                borderRadius: 20,
-                fontSize: 24,
-                padding: 8,
-              }}
-            />
-          }
-          title={"Deposits"}
-          value={deposits}
-        />
+    <Space size={20} direction="vertical" style={{ width: "100%" }}>
+      {/* <Typography.Title level={4}>Dashboard</Typography.Title> */}
+
+      {/* Move Trip Statistics to the top */}
+      <Row gutter={[16, 16]} justify="center">
+        <Col span={24}>
+          <TripStatistics />  {/* TripStatistics Component */}
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} lg={8}>
+          <DashboardCard
+            icon={
+              <ShoppingOutlined
+                style={{
+                  color: "blue",
+                  backgroundColor: "rgba(0,0,255,0.25)",
+                  borderRadius: 20,
+                  fontSize: 24,
+                  padding: 8,
+                }}
+              />
+            }
+            title={"Deposits"}
+            value={deposits}
+          />
+        </Col>
         
-        <DashboardCard
-          icon={
-            <DollarCircleOutlined
-              style={{
-                color: "red",
-                backgroundColor: "rgba(255,0,0,0.25)",
-                borderRadius: 20,
-                fontSize: 24,
-                padding: 8,
-              }}
-            />
-          }
-          title={"Revenue"}
-          value={revenue}
-        />
-      </Space>
-      
-      <Space>
-        <TopDepositors data={topDepositors} />
-      </Space>
+        <Col xs={24} sm={12} lg={8}>
+          <DashboardCard
+            icon={
+              <DollarCircleOutlined
+                style={{
+                  color: "red",
+                  backgroundColor: "rgba(255,0,0,0.25)",
+                  borderRadius: 20,
+                  fontSize: 24,
+                  padding: 8,
+                }}
+              />
+            }
+            title={"Revenue"}
+            value={revenue}
+          />
+        </Col>
+      </Row>
+
+      {/* Di chuyển TopDepositors xuống dưới cùng và rộng ngang hết */}
+      <Row>
+        <Col xs={24}>
+          <TopDepositors data={topDepositors} />
+        </Col>
+      </Row>
     </Space>
   );
 }
@@ -100,7 +95,6 @@ function Dashboard() {
 function DashboardCard({ title, value, icon }) {
   return (
     <Card>
-      
       <Space direction="horizontal">
         {icon}
         <Statistic title={title} value={value} />
@@ -110,21 +104,37 @@ function DashboardCard({ title, value, icon }) {
 }
 
 function TopDepositors({ data }) {
-  console.log("Top Depositors Data:", data);
   const validData = Array.isArray(data) ? data : [];
+  const [userNames, setUserNames] = useState({});
+
+  useEffect(() => {
+    const fetchUserNames = async () => {
+      const names = {};
+      for (const depositor of validData) {
+        try {
+          const response = await axios.get(`/Profile/${depositor.userId}`);
+          names[depositor.userId] = response.data.name;
+        } catch (error) {
+          console.error(`Error fetching name for user ${depositor.userId}:`, error);
+        }
+      }
+      setUserNames(names);
+    };
+
+    fetchUserNames();
+  }, [validData]);
 
   return (
     <>
-      <Typography.Text style={{ fontSize: '24px',color: 'red', fontWeight: '500' }}>Top 5 Depositors</Typography.Text>
+      <Typography.Text style={{ fontSize: '24px', color: 'red', fontWeight: '500' }}>Top 5 Depositors</Typography.Text>
       <Table
         columns={[
-          {
-            title: "User ID",
-            dataIndex: "userId",
+          { title: "User ID", dataIndex: "userId" },
+          { title: "Name", dataIndex: "userId",
+            render: (userId) => <span>{userNames[userId] || 'Unknown'}</span>,
           },
-          {
-            title: "Total Deposits",
-            dataIndex: "totalDeposit",
+          { title: "Total Deposits", dataIndex: "totalDeposit",
+            render: (value) => <span>{value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) || 'Unknown'}</span>,
           },
         ]}
         dataSource={validData}

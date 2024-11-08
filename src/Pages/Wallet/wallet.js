@@ -63,7 +63,7 @@ const Wallet = () => {
     <Space size={20} direction="vertical">
       <Typography.Title level={4}>User Management with Wallets</Typography.Title>
       <Space>
-        <Button type="primary" onClick={() => navigate('/inventory')}>Go to Users</Button>
+        <Button type="primary" onClick={() => navigate('/Management')}>Go to Users</Button>
         <Button type="primary" onClick={() => navigate('/trip-type')}>Go to TripType</Button>
         <Button type="primary" onClick={() => navigate('/trip-type-pricing')}>Go to TripTypePricing</Button>
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
@@ -123,7 +123,7 @@ const Wallet = () => {
               {
                 title: "Balance",
                 dataIndex: "balance", // Display wallet balance
-                render: (value) => <span>${value.toLocaleString()}</span>,
+                render: (value) => <span>{value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) || 'Unknown'}</span>,
               },
               {
                 title: "Currency Code",

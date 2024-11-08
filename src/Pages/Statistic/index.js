@@ -2,7 +2,6 @@ import { Space, Typography, message, Row, Col } from "antd";
 import { useEffect, useState } from "react";
 import axios from "../../config/axios";
 import BarChart from "../../Components/BarChart/BarChart";
-import PieChart from "../../Components/PieChart/PieChart";
 
 function TripStatistics() {
   const [loading, setLoading] = useState(false);
@@ -61,11 +60,6 @@ function TripStatistics() {
         <Row gutter={16} justify="center">
           <Col xs={24} sm={16} md={16} lg={16} xl={16}>
             <BarChart chartData={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
-          </Col>
-          <Col xs={24} sm={8} md={8} lg={8} xl={8} style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{ width: '80%', maxWidth: '300px' }}>
-              <PieChart chartData={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
-            </div>
           </Col>
         </Row>
       )}

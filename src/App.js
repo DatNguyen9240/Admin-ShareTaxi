@@ -11,10 +11,9 @@ import Transaction from "./Pages/Transaction/transaction";
 import Wallet from "./Pages/Wallet/wallet";
 import Login from "./Pages/Login/login";
 import { useAuth } from './Components/AuthContext'; 
-import TripStatistics from "./Pages/Statistic";
 import Dashboard from "./Pages/Dashbaord/";
-import Inventory from "./Pages/Inventory";
-import Orders from "./Pages/Orders";
+import Management from "./Pages/Management";
+import TripSystems from "./Pages/Trip Systems";
 import AllStaff from "./Pages/allStaff/allStaff";
 import Location from "./Pages/Location/location";
 function App() {
@@ -29,9 +28,8 @@ function App() {
     { path: "/transaction", component: Transaction, roles: ['admin'] },
     { path: "/wallet", component: Wallet, roles: ['admin', 'staff'] },
     { path: "/dashboard", component: Dashboard, roles: ['admin'] },
-    { path: "/inventory", component: Inventory, roles: ['admin'] },
-    { path: "/orders", component: Orders, roles: ['admin', 'staff'] },
-    { path: "/statistic", component: TripStatistics, roles: ['admin'] },
+    { path: "/Management", component: Management, roles: ['admin'] },
+    { path: "/TripSystems", component: TripSystems, roles: ['admin', 'staff'] },
     { path: "/all-staff", component: AllStaff, roles: ['admin'] },
 
 

@@ -101,7 +101,7 @@ const CreateTrip = () => {
     <Space size={20} direction="vertical">
       <Typography.Title level={4}>Trip Type Management</Typography.Title>
       <Space>
-        <Button type="primary" onClick={() => navigate('/inventory')}>Go to Users</Button>
+        <Button type="primary" onClick={() => navigate('/Management')}>Go to Users</Button>
         <Button type="primary" onClick={() => navigate('/trip-type')}>Go to TripType</Button>
         <Button type="primary" onClick={() => navigate('/trip-type-pricing')}>Go to TripTypePricing</Button>
         <Button type="primary" onClick={() => navigate('/area')}>Go to Area</Button>
@@ -117,7 +117,7 @@ const CreateTrip = () => {
           { title: "To Area ID", dataIndex: "toAreaId" },
           { title: "Trip Name", dataIndex: "name" },
           { title: "Description", dataIndex: "description" },
-          { title: "Base Price", dataIndex: "basicePrice", render: (value) => <span>${value}</span> },
+          { title: "Base Price", dataIndex: "basicePrice", render: (value) => <span>{value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) || 'Unknown'}</span> },
           { title: "Status", dataIndex: "status", render: (value) => (value === 1 ? 'Active' : 'Inactive') },
           {
             title: (

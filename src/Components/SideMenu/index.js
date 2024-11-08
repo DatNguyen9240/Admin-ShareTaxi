@@ -29,8 +29,8 @@ function SideMenu() {
       key: "/dashboard",
     },
     {
-      label: "Inventory",
-      key: "/inventory",
+      label: "Management",
+      key: "/Management",
       icon: <ShopOutlined />,
     },
     {
@@ -39,13 +39,8 @@ function SideMenu() {
       icon: <UserOutlined />,
     },
     {
-      label: "Statistic",
-      key: "/statistic",
-      icon: <UserOutlined />,
-    },
-    {
-      label: "Orders",
-      key: "/orders",
+      label: "Trip Systems",
+      key: "/TripSystems",
       icon: <ShoppingCartOutlined />,
     },
     
@@ -53,8 +48,8 @@ function SideMenu() {
 
   const staffMenuItems = [
     {
-      label: "Orders",
-      key: "/orders",
+      label: "Trip Systems",
+      key: "/Trip Systems",
       icon: <ShoppingCartOutlined />,
     },
 

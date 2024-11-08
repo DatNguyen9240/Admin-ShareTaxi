@@ -256,19 +256,26 @@ const CreateTrip = () => {
       message.error('Error adding trip. Please try again.');
     }
   };
-
-  const viewTripDetails = async (trip) => {
-    console.log("Viewing details for trip:", trip);
+  const userInTripDatas = async (value) => {
     try {
-      const [userInTripResponse] = await Promise.all([
-        axios.get(`Booking/usersInTrip/${trip.id}`),
-      ]);
+      const userInTripResponse = await axios.get(`Booking/usersInTrip/${value}`);
       const userInTripData = userInTripResponse.data.$values || [];
-      setUserInTripData(userInTripData);
+      
+      return Promise.all(userInTripData.map(async (user) => {
+        return (
+          <div key={user.id}>
+            <p><strong>User Id:</strong> {user.id} - <strong>User Name:</strong> {user.name}</p>
+          </div>
+        );
+      }));
     } catch (error) {
       console.error('Error fetching users in trip:', error);
       message.error('Error fetching users in trip. Please try again.');
     }
+  };
+  const viewTripDetails = async (trip) => {
+    console.log("Viewing details for trip:", trip);
+    
     Modal.info({
       title: 'Trip Details',
       content: (
@@ -283,22 +290,18 @@ const CreateTrip = () => {
           <p><strong>Driver Name:</strong> {trip.driverInfo ? trip.driverInfo.driverName : "No driver assigned"}</p>
           <p><strong>Status:</strong> {mapValueToStatus(trip.status)}</p>
           <p><strong>Total Users:</strong> {userInTripData.length}</p>
-          {userInTripData.map((user) => (
-            <div key={user.id}>
-              <p><strong>User Id:</strong> {user.id} - <strong>User Name:</strong> {user.name}</p>
-            </div>
-          ))}
+          <p> {await userInTripDatas(trip.id)}</p>
         </div>
       ),
       onOk() {},
     });
   };
 
-  const checkTripFull = async (tripId) => {
+  const checkCurrentBookingsCount = async (tripId) => {
     try {
 
       const response = await axios.get(`Booking/checkTripFull/${tripId}`);
-      return response.data.isFull ? "Yes" : "No";
+      return response.data.currentBookingsCount;
     } catch (error) {
       console.error('Error checking trip full status:', error);
       return "Error";
@@ -306,8 +309,8 @@ const CreateTrip = () => {
   };
 
   const fetchTripFullStatus = async (tripId) => {
-    const isFull = await checkTripFull(tripId);
-    setTripFullStatus(prev => ({ ...prev, [tripId]: isFull }));
+    const bookingsCount = await checkCurrentBookingsCount(tripId);
+    setTripFullStatus(prev => ({ ...prev, [tripId]: bookingsCount }));
   };
 
   useEffect(() => {
@@ -326,13 +329,13 @@ const CreateTrip = () => {
         columns={[
           { title: "Pick Up Location", dataIndex: "pickUpLocationName" },
           { title: "Drop Off Location", dataIndex: "dropOffLocationName" },
-          { title: "Base Price", dataIndex: "unitPrice", render: (value) => <span>${value.toLocaleString()}</span> },
+          { title: "Base Price", dataIndex: "unitPrice", render: (value) => <span>{value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) || 'Unknown'}</span> },
           { title: "Max Passengers", dataIndex: "maxPerson" },
           { title: "Min Passengers", dataIndex: "minPerson" },
           { title: "Departure Date", dataIndex: "bookingDate", render: (value) => formatISODate(value) },
           { title: "Departure Time", dataIndex: "hourInDay" },
           {
-            title: "Is Full",
+            title: "Number on Trip",
             render: (text, trip) => (
               <span>{tripFullStatus[trip.id] || "Loading..."}</span>
             ),
@@ -363,7 +366,7 @@ const CreateTrip = () => {
             ),
             render: (text, trip) => (
               <Space>
-                <Button onClick={() => showEditModal(trip)}>Edit Status</Button>
+                <Button onClick={() => showEditModal(trip)} disabled={trip.status === 0 || trip.status === 3}>Edit Status</Button>
                 <Button type="primary" onClick={() => showDriverModal(trip)}>
                   {trip.driverInfo ? "Edit Driver" : "Call Driver"}
                 </Button>
