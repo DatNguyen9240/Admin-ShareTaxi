@@ -288,8 +288,12 @@ const CreateTrip = () => {
           <p><strong>Departure Date:</strong> {formatISODate(trip.bookingDate)}</p>
           <p><strong>Departure Time:</strong> {trip.hourInDay}</p>
           <p><strong>Driver Name:</strong> {trip.driverInfo ? trip.driverInfo.driverName : "No driver assigned"}</p>
+          <p><strong>Driver Phone:</strong> {trip.driverInfo ? trip.driverInfo.driverPhone : "No driver phone"}</p>
           <p><strong>Status:</strong> {mapValueToStatus(trip.status)}</p>
-          <p><strong>Total Users:</strong> {userInTripData.length}</p>
+          <p><strong>Plate Number:</strong> {trip.driverInfo ? trip.driverInfo.plateNumber : "No plate number"}</p>
+          <p><strong>Arrived Time:</strong> {trip.driverInfo ? trip.driverInfo.arrivedTime : "No arrived time"}</p>
+          
+          {/* <p><strong>Total Users:</strong> {userInTripData.length}</p> */}
           <p> {await userInTripDatas(trip.id)}</p>
         </div>
       ),
@@ -337,7 +341,7 @@ const CreateTrip = () => {
           {
             title: "Number on Trip",
             render: (text, trip) => (
-              <span>{tripFullStatus[trip.id] || "Loading..."}</span>
+              <span>{tripFullStatus[trip.id] || "0"}</span>
             ),
           },
           {
@@ -345,6 +349,7 @@ const CreateTrip = () => {
             dataIndex: ["driverInfo", "driverName"],
             render: (driverName) => driverName || "No driver assigned",
           },
+          
           {
             title: "Status",
             dataIndex: "status",
