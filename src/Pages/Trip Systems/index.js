@@ -289,6 +289,7 @@ const CreateTrip = () => {
           <p><strong>Departure Time:</strong> {trip.hourInDay}</p>
           <p><strong>Driver Name:</strong> {trip.driverInfo ? trip.driverInfo.driverName : "No driver assigned"}</p>
           <p><strong>Driver Phone:</strong> {trip.driverInfo ? trip.driverInfo.driverPhone : "No driver phone"}</p>
+          <p><strong>Number on Trip:</strong> {tripFullStatus[trip.id] || "0"}</p>
           <p><strong>Status:</strong> {mapValueToStatus(trip.status)}</p>
           <p><strong>Plate Number:</strong> {trip.driverInfo ? trip.driverInfo.plateNumber : "No plate number"}</p>
           <p><strong>Arrived Time:</strong> {trip.driverInfo ? trip.driverInfo.arrivedTime : "No arrived time"}</p>
