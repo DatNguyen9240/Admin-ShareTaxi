@@ -34,7 +34,7 @@ function Login() {
         if (role === "admin") {
           navigate("/dashboard"); // Redirect admin to the dashboard
         } else if (role === "staff") {
-          navigate("/orders"); // Redirect staff to orders page
+          navigate("/TripSystems"); // Redirect staff to orders page
         } else {
           message.error("Access denied. Unknown role.");
         }

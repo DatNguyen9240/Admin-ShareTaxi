@@ -89,7 +89,7 @@ function UserManagement() {
           { title: "Name", dataIndex: "name" },
           { title: "Email", dataIndex: "email" },
           { title: "Phone Number", dataIndex: "phoneNumber" },
-          { title: "Date of Birth", dataIndex: "DateOfBirth" },
+          { title: "Date of Birth", dataIndex: "DateOfBirth", render: (text) => dayjs(text).format('DD/MM/YYYY') },
           { title: "Password", dataIndex: "password" },
           { title: "Created At", dataIndex: "CreatedAt" },
           { title: "Role", dataIndex: "role" },
@@ -154,6 +154,7 @@ function UserManagement() {
             <Input 
               type="date" 
               style={{ width: '100%' }} 
+              format="DD/MM/YYYY"
             />
           </Form.Item>
           <Form.Item

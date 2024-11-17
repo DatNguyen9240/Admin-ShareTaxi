@@ -282,7 +282,7 @@ const CreateTrip = () => {
         <div>
           <p><strong>Pick Up Location:</strong> {trip.pickUpLocationName}</p>
           <p><strong>Drop Off Location:</strong> {trip.dropOffLocationName}</p>
-          <p><strong>Base Price:</strong> ${trip.unitPrice.toLocaleString()}</p>
+          <p><strong>Base Price:</strong> {trip.unitPrice.toLocaleString()}</p>
           <p><strong>Max Passengers:</strong> {trip.maxPerson}</p>
           <p><strong>Min Passengers:</strong> {trip.minPerson}</p>
           <p><strong>Departure Date:</strong> {formatISODate(trip.bookingDate)}</p>

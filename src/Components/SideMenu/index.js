@@ -49,7 +49,7 @@ function SideMenu() {
   const staffMenuItems = [
     {
       label: "Trip Systems",
-      key: "/Trip Systems",
+      key: "/TripSystems",
       icon: <ShoppingCartOutlined />,
     },
 
